@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Scandiweb\Test\Setup\Patch\Data;
 
-use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Catalog\Api\CategoryLinkManagementInterface;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -19,22 +18,21 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Validation\ValidationException;
 use Magento\InventoryApi\Api\Data\SourceItemInterfaceFactory;
 use Magento\InventoryApi\Api\SourceItemsSaveInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 
 
-class CreateScandiwebShirt
-implements DataPatchInterface
-{
+class CreateScandiwebShirt implements DataPatchInterface {
     /**
      * @var ProductInterfaceFactory
      */
@@ -71,24 +69,36 @@ implements DataPatchInterface
     protected EavSetup $eavSetup;
 
     /**
+     * @var CategoryCollectionFactory
+     */
+    protected CategoryCollectionFactory $categoryCollectionFactory;
+
+    /**
      * @var array
      */
     protected array $sourceItems = [];
 
-    protected CategoryCollectionFactory $categoryCollectionFactory;
-
-
-
+    /**
+     * @param State                           $appState,
+     * @param ProductInterfaceFactory         $productInterfaceFactory,
+     * @param ProductRepositoryInterface      $productRepository,
+     * @param StoreManagerInterface           $storeManager,
+     * @param EavSetup                        $eavSetup,
+     * @param SourceItemInterfaceFactory      $sourceItemFactory,
+     * @param SourceItemsSaveInterface        $sourceItemsSaveInterface,
+     * @param CategoryLinkManagementInterface $categoryLink,
+     * @param CategoryCollectionFactory       $categoryCollectionFactory
+     */
     public function __construct(
-        State $appState,
-        ProductInterfaceFactory $productInterfaceFactory,
-        ProductRepositoryInterface $productRepository,
-        StoreManagerInterface $storeManager,
-        EavSetup $eavSetup,
-        SourceItemInterfaceFactory $sourceItemFactory,
-        SourceItemsSaveInterface $sourceItemsSaveInterface,
+        State                           $appState,
+        ProductInterfaceFactory         $productInterfaceFactory,
+        ProductRepositoryInterface      $productRepository,
+        StoreManagerInterface           $storeManager,
+        EavSetup                        $eavSetup,
+        SourceItemInterfaceFactory      $sourceItemFactory,
+        SourceItemsSaveInterface        $sourceItemsSaveInterface,
         CategoryLinkManagementInterface $categoryLink,
-        CategoryCollectionFactory $categoryCollectionFactory
+        CategoryCollectionFactory       $categoryCollectionFactory
     ) {
         $this->appState = $appState;
         $this->productInterfaceFactory = $productInterfaceFactory;
@@ -102,10 +112,16 @@ implements DataPatchInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public static function getDependencies(): array {
+        return [CreateMenCategory::class];
+    }
+
+    /**
      * Add new product
      */
-    public function apply(): void
-    {
+    public function apply(): void {
         $this->appState->emulateAreaCode('adminhtml', [$this, 'execute']);
     }
 
@@ -117,8 +133,7 @@ implements DataPatchInterface
      * @throws ValidationException
      */
 
-    public function execute()
-    {
+    public function execute() {
         // create the product
         $product = $this->productInterfaceFactory->create();
 
@@ -156,16 +171,7 @@ implements DataPatchInterface
     /**
      * {@inheritDoc}
      */
-    public static function getDependencies(): array
-    {
-        return [\Scandiweb\Test\Setup\Patch\Data\CreateMenCategory::class];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAliases(): array
-    {
+    public function getAliases(): array {
         return [];
     }
 }

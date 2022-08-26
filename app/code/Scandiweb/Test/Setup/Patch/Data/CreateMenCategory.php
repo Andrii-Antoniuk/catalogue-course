@@ -3,25 +3,24 @@
 
 namespace Scandiweb\Test\Setup\Patch\Data;
 
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Catalog\Setup\CategorySetup;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory as CategoryCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
 
-class CreateMenCategory implements DataPatchInterface
-{
-
+class CreateMenCategory implements DataPatchInterface {
+    /**
+     * @var StoreManagerInterface
+     */
     protected StoreManagerInterface $storeManagerInterface;
 
-    /*
-		 * CategorySetup
-     * @var Category
+    /**
+     * @var CategorySetup
      */
     protected CategorySetup $categorySetup;
 
-    /*
-		 * CategoryCollectionFactory
-     * @var Category
+    /**
+     * @var CategoryCollectionFactory
      */
     protected CategoryCollectionFactory $categoryCollectionFactory;
 
@@ -31,8 +30,8 @@ class CreateMenCategory implements DataPatchInterface
      * @param CategoryCollectionFactory $categoryCollectionFactory
      */
     public function __construct(
-        StoreManagerInterface $storeManagerInterface,
-        CategorySetup $categorySetup,
+        StoreManagerInterface     $storeManagerInterface,
+        CategorySetup             $categorySetup,
         CategoryCollectionFactory $categoryCollectionFactory
     ) {
         $this->categorySetup = $categorySetup;
@@ -40,9 +39,14 @@ class CreateMenCategory implements DataPatchInterface
         $this->storeManagerInterface = $storeManagerInterface;
     }
 
-    //...
-    public function apply()
-    {
+    /**
+     * {@inheritDoc}
+     */
+    public static function getDependencies(): array {
+        return [];
+    }
+
+    public function apply() {
         //Get's root category ID, since we want it to be the child of root
         $parentId = $this->storeManagerInterface->getStore()->getRootCategoryId();
 
@@ -67,16 +71,7 @@ class CreateMenCategory implements DataPatchInterface
     /**
      * {@inheritDoc}
      */
-    public static function getDependencies(): array
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAliases(): array
-    {
+    public function getAliases(): array {
         return [];
     }
 }
